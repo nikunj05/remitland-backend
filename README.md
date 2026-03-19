@@ -18,6 +18,7 @@ This project uses Laravel for the API/backend and a Node.js Socket.IO server for
 - Node.js 18+
 - npm
 - PostgreSQL database (Supabase)
+- Redis server (local or hosted)
 
 ## 1. Clone Laravel Project
 
@@ -79,6 +80,34 @@ SOCKETIO_HOST=localhost
 SOCKETIO_PORT=3000
 ```
 
+### Redis Config in `.env`
+
+This project uses Redis for cache (`CACHE_STORE=redis`). Add the following values in your `.env`:
+
+```env
+CACHE_STORE=redis
+REDIS_CLIENT=predis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+```
+
+If Redis is running on another server, replace `REDIS_HOST`, `REDIS_PORT`, and `REDIS_PASSWORD` with your actual values.
+
+### Start Redis Locally
+
+If Redis is installed locally, start it before running the app:
+
+```bash
+redis-server
+```
+
+Or if you use systemd:
+
+```bash
+sudo systemctl start redis
+```
+
 ## 5. Run Migration
 
 ```bash
@@ -133,11 +162,12 @@ http://localhost:3000
 2. `composer install`
 3. `npm install`
 4. Configure `.env` (Supabase + Socket.IO)
-5. `php artisan migrate`
-6. `php artisan db:seed`
-7. `php artisan serve`
-8. `php artisan queue:work`
-9. `node socket-server.js`
+5. Start Redis (`redis-server` or `sudo systemctl start redis`)
+6. `php artisan migrate`
+7. `php artisan db:seed`
+8. `php artisan serve`
+9. `php artisan queue:work`
+10. `node socket-server.js`
 
 ## Optional: Frontend Dev Server
 
@@ -152,6 +182,7 @@ npm run dev
 - If broadcasting does not work, confirm both servers are running (`php artisan serve` and `node socket-server.js`).
 - If queued transaction creation is not working, confirm the queue worker is running (`php artisan queue:work`).
 - If DB connection fails, verify Supabase host/port/user/password and `DB_CONNECTION=pgsql`.
+- If cache errors mention Redis connection refused, check Redis is running and verify `REDIS_HOST`/`REDIS_PORT` in `.env`.
 - If migrations fail on a non-empty database, check existing schema/tables in Supabase before re-running.
 
 ## License
